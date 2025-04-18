@@ -1,0 +1,79 @@
+html, body, #root {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+  }
+  
+
+
+.background{
+    
+    background-color: aquamarine;
+}
+
+.container2 {
+    display: flex;
+    flex-direction: column; /* change from row to column */
+    justify-content: center;
+    align-items: center;
+    gap: 30px;
+    background-color: #b8ad9e;
+  }
+  
+
+
+.container {
+  display: flex;
+  justify-content: center; /* center horizontally */
+  align-items: center; /* center vertically */
+  display: flex;
+  height: 100vh; /* fill the viewport vertically */
+  width: 100vw;  /* fill the available width */
+  background-color: #b8ad9e;
+  overflow-x: hidden; /* Hide horizontal scrollbar */
+  
+}
+
+/* Home.css */
+
+/* (optional) reset box‑sizing so padding/borders are included in width/height */
+*, *::before, *::after {
+    box-sizing: border-box;
+  }
+  
+  /* style the Box wrapper */
+  .myBox {
+    padding: 16px;              /* same as your sx p:2 */
+    border: 1px solid;          /* same as sx border:1 */
+    border-radius: 16px;
+    width: 65vw;
+    height: 5vh;
+    display: flex;              /* turn on flex so child can flex-grow */
+  }
+  
+  /* make the input fill its parent */
+  .myBox .myInput {
+    flex: 1;                    /* take all available space */
+    width: 100%;                /* fallback in case parent isn’t flex */
+    height: 100%;
+    border: none;               /* remove default input border if you like */
+    outline: none;              /* remove the blue focus ring if you like */
+    background-color: #b8ad9e;
+    color:white
+  }
+  
+
+  .news-cycle-regular {
+    font-family: "News Cycle", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+  
+  .news-cycle-bold {
+    font-family: "News Cycle", sans-serif;
+    font-weight: 700;
+    font-style: normal;
+  }
+  
