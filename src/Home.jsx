@@ -9,12 +9,13 @@ const Home = () => {
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(false);
   const [responses, setResponses] = useState([]); // Array to hold all responses
-
+  console.log('Responses:', responses);
   const handleClick = async () => {
     if (inputText.trim() === '') return;
     setLoading(true);
   
     try {
+      // Step 1: Get name suggestions from OpenAI
       const res = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -41,7 +42,6 @@ const Home = () => {
       if (!res.ok) {
         const errorData = await res.json();
         console.error('OpenAI Error:', errorData);
-        // Add error message to responses
         setResponses(prev => [...prev, {
           query: inputText,
           result: `Error: ${errorData.error?.message || 'Unknown error from OpenAI'}`,
@@ -53,20 +53,35 @@ const Home = () => {
   
       const data = await res.json();
       const message = data.choices[0].message.content;
-      
-      // Add new response to the responses array
+      const names = message.split('\n').map(name => name.replace(/^\d+[\).]\s*/, '').trim()).filter(n => n);
+  
+      // Step 2: Check domain availability for the first suggested name
+      let domainAvailable = null;
+if (names.length > 0) {
+  try {
+    console.log(`Checking domain for ${names[0]}`);
+
+
+    const domainRes = await fetch(`http://localhost:5001/check-domain?name=${names[0]}`);
+    const domainData = await domainRes.json();
+    domainAvailable = domainData.available;
+  } catch (err) {
+    console.error('Domain check error:', err);
+    domainAvailable = 'Error checking domain';
+  }
+}
+  
+      // Step 3: Update responses with names and domain check
       setResponses(prev => [...prev, {
         query: inputText,
-        result: message,
+        result: `${message}\n\n${names[0]}.com is ${domainAvailable ? 'available ✅' : 'unavailable ❌'}`,
         timestamp: new Date().toLocaleTimeString(),
         isError: false
       }]);
-      
-      // Clear input field after successful submission
+  
       setInputText('');
     } catch (error) {
       console.error('Error generating names:', error);
-      // Add error message to responses
       setResponses(prev => [...prev, {
         query: inputText,
         result: `Error: ${error.message || 'Something went wrong!'}`,
@@ -77,6 +92,7 @@ const Home = () => {
       setLoading(false);
     }
   };
+  
   
   return (
     <div className='container news-cycle-regular'>
@@ -129,7 +145,7 @@ const Home = () => {
             borderColor:'white',
             borderRadius: '16px',
             width: '65vw',
-            height: '5vh',
+            height: '8vh',
             display: 'flex',
             alignItems: 'center',
             gap: '1rem'
@@ -144,6 +160,8 @@ const Home = () => {
             onKeyPress={(e) => e.key === 'Enter' && handleClick()}
             style={{ flexGrow: 1, border: 'none', outline: 'none', fontSize: '1rem' }}
           />
+          
+
           <Button
             variant="contained"
             sx={{
