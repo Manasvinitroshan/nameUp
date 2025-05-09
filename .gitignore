@@ -25,3 +25,25 @@ dist-ssr
 nameUp/.env
 .env # ignore it from now on
 .env
+
+# Dependency directories
+backend/node_modules
+node_modules/
+
+# Environment files
+.env
+backend/.env
+nameUp/.env
+
+# Build directories
+build/
+dist/
+
+# IDE / OS junk
+.DS_Store
+.vscode/
+*.log
+
+# Optional: lockfiles (if using only yarn/npm consistently)
+yarn.lock
+package-lock.json

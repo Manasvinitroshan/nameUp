@@ -15,7 +15,6 @@ const Home = () => {
     setLoading(true);
   
     try {
-      // Step 1: Get name suggestions from OpenAI
       const res = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -55,26 +54,27 @@ const Home = () => {
       const message = data.choices[0].message.content;
       const names = message.split('\n').map(name => name.replace(/^\d+[\).]\s*/, '').trim()).filter(n => n);
   
-      // Step 2: Check domain availability for the first suggested name
-      let domainAvailable = null;
-if (names.length > 0) {
-  try {
-    console.log(`Checking domain for ${names[0]}`);
-
-
-    const domainRes = await fetch(`http://localhost:5001/check-domain?name=${names[0]}`);
-    const domainData = await domainRes.json();
-    domainAvailable = domainData.available;
-  } catch (err) {
-    console.error('Domain check error:', err);
-    domainAvailable = 'Error checking domain';
-  }
-}
+      // ✅ Check domains for ALL names
+      const domainResults = await Promise.all(
+        names.map(async (name) => {
+          try {
+            const domainRes = await fetch(`http://localhost:5001/check-domain?name=${name}`);
+            const domainData = await domainRes.json();
+            return { name, available: domainData.available };
+          } catch (err) {
+            console.error(`Domain check error for ${name}:`, err);
+            return { name, available: 'Error checking domain' };
+          }
+        })
+      );
   
-      // Step 3: Update responses with names and domain check
+      // ✅ Add to responses
       setResponses(prev => [...prev, {
         query: inputText,
-        result: `${message}\n\n${names[0]}.com is ${domainAvailable ? 'available ✅' : 'unavailable ❌'}`,
+        result: `${message}\n\n` +
+                domainResults.map(d =>
+                  `${d.name} is ${d.available === true ? 'available ✅' : d.available === false ? 'unavailable ❌' : d.available}`
+                ).join('\n'),
         timestamp: new Date().toLocaleTimeString(),
         isError: false
       }]);
@@ -92,6 +92,7 @@ if (names.length > 0) {
       setLoading(false);
     }
   };
+  
   
   
   return (
